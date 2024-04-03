@@ -1,74 +1,56 @@
-import React, { useState, useContext } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TextInput,
-  TouchableOpacity,
-} from "react-native";
+import React, { useState, useEffect, useContext } from "react";
+import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, Switch } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import axios from "axios";
+import { useFocusEffect } from "@react-navigation/native";
 import { AuthContext } from "../context/auth_context";
+import TaskComponent from "../components/task";
 
-const Dasboard = ({ navigation }) => {
+const Dashboard = ({ navigation }) => {
   const { currentUser } = useContext(AuthContext);
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
+  const [showCompletedTasks, setShowCompletedTasks] = useState(false); // Estado para controlar se as tarefas concluídas devem ser exibidas
+  const [tasks, setTasks] = useState([]);
+
+  const fetchTasks = async () => {
+    if (!currentUser) return;
+    const user = JSON.parse(currentUser);
+    try {
+      const response = await axios.get(`http://192.168.0.112:3333/tasks/find/${user.id}`);
+      setTasks(response.data);
+      console.log(tasks);
+    } catch (error) {
+      console.error("Erro ao obter tarefas:", error);
+    }
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchTasks();
+    }, [])
+  );
 
   const handleSearch = (text) => {
     setSearchQuery(text);
-    // Aqui você pode implementar a lógica para realizar a busca no seu array de dados
-    // Neste exemplo, vou apenas simular uma busca filtrando os elementos do array
-    const filteredResults = yourArray.filter((item) =>
-      item.toLowerCase().includes(text.toLowerCase())
-    );
-    setSearchResults(filteredResults);
+    // Lógica de busca aqui...
+  };
+
+  // Função para alternar entre mostrar e ocultar as tarefas concluídas
+  const toggleShowCompletedTasks = () => {
+    setShowCompletedTasks(!showCompletedTasks);
   };
 
   return (
-    <View
-      style={{
-        backgroundColor: "#fff",
-        flex: 1,
-        justifyContent: "flex-start",
-        alignItems: "center",
-      }}
-    >
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 30,
-          width: "100%",
-          marginTop: 50,
-        }}
-      >
+    <View style={styles.container}>
+      <View style={styles.header}>
         <Image
-          style={{ width: 50, height: 40, marginLeft: 10 }}
+          style={styles.logo}
           source={require("../assets/logo.png")}
         />
-        <Text
-          style={{
-            marginRight: 20,
-            fontSize: 25,
-            fontWeight: "bold",
-            color: "#0b1f51",
-          }}
-        >
-          Tarefas
-        </Text>
+        <Text style={styles.headerTitle}>Tarefas</Text>
       </View>
-
-      {/* Barra de pesquisa */}
       <View style={styles.searchContainer}>
-        <FontAwesome
-          name="search"
-          size={20}
-          color="gray"
-          style={styles.searchIcon}
-        />
+        <FontAwesome name="search" size={20} color="gray" style={styles.searchIcon} />
         <TextInput
           style={styles.searchInput}
           placeholder="Pesquisar..."
@@ -76,37 +58,69 @@ const Dasboard = ({ navigation }) => {
           onChangeText={handleSearch}
         />
       </View>
-
-      {/* Resultados da busca */}
-      <View style={styles.resultsContainer}>
-        {searchResults.map((result, index) => (
-          <Text key={index} style={styles.resultItem}>
-            {result}
-          </Text>
-        ))}
-      </View>
-      <TouchableOpacity style={styles.add} onPress={()=>navigation.navigate("Add_task")}>
-        <FontAwesome
-          name="plus"
-          size={20}
-          color="white"
-
+      {/* Adicionando o Switch */}
+      <View style={styles.switchContainer}>
+        <Text>Mostrar tarefas concluídas</Text>
+        <Switch
+          value={showCompletedTasks}
+          onValueChange={toggleShowCompletedTasks}
         />
+      </View>
+      <View style={styles.resultsContainer}>
+        {tasks.length > 0 ? (
+          tasks
+            // Aplicando filtro para mostrar ou ocultar tarefas concluídas com base no estado do Switch
+            .filter(task => showCompletedTasks || !task.completed)
+            .map((task, index) => (
+              <TaskComponent key={index} task={task} />
+            ))
+        ) : (
+          <Text style={styles.noTasksText}>Nenhuma tarefa encontrada.</Text>
+        )}
+      </View>
+      <TouchableOpacity style={styles.addButton} onPress={() => navigation.navigate("Add_task")}>
+        <FontAwesome name="plus" size={20} color="white" />
       </TouchableOpacity>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    backgroundColor: "#fff",
+    flex: 1,
+    justifyContent: "flex-start",
+    alignItems: "center",
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 30,
+    width: "100%",
+    marginTop: 50,
+  },
+  logo: {
+    width: 50,
+    height: 40,
+    marginLeft: 20,
+  },
+  headerTitle: {
+    marginRight: 20,
+    fontSize: 25,
+    fontWeight: "bold",
+    color: "#0b1f51",
+  },
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: 10,
     paddingHorizontal: 20,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: "gray",
-    borderRadius: 5,
-    width: "95%",
+    borderRadius: 8,
+    width: "90%",
+    height:50
   },
   searchInput: {
     flex: 1,
@@ -120,12 +134,10 @@ const styles = StyleSheet.create({
     marginTop: 20,
     paddingHorizontal: 20,
   },
-  resultItem: {
-    marginBottom: 10,
+  noTasksText: {
     fontSize: 16,
-    color: "#333",
   },
-  add: {
+  addButton: {
     position: "absolute",
     bottom: 40,
     right: 30,
@@ -134,9 +146,15 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     width: 75,
     height: 75,
-    justifyContent:'center',
-    alignItems:'center'
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  switchContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    marginTop: 10,
   },
 });
 
-export default Dasboard;
+export default Dashboard;

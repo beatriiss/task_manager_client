@@ -25,7 +25,7 @@ export const AuthContextProvider = ({ children }) => {
     }
 
     try {
-      const response = await axios.post('http://192.168.1.102:3333/user/login', {
+      const response = await axios.post('http://192.168.0.112:3333/user/login', {
         username,
         password
       });
@@ -53,7 +53,7 @@ export const AuthContextProvider = ({ children }) => {
     }
 
     try {
-      const response = await axios.post('http://192.168.1.102:3333/user/cadastro', {
+      const response = await axios.post('http://192.168.0.112:3333/user/cadastro', {
         username,
         email,
         password

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   View,
   Text,
@@ -8,29 +8,29 @@ import {
 } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import axios from "axios";
+import { AuthContext } from "../context/auth_context";
 
 const AddTask = ({ navigation }) => {
+  const { currentUser } = useContext(AuthContext);
   const [description, setDescription] = useState("");
-  const [completionDate, setCompletionDate] = useState("");
-  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
-  const handleAddTask = () => {
-    // Aqui você pode implementar a lógica para adicionar a tarefa
-    console.log("Descrição:", description);
-    console.log("Data de conclusão:", completionDate);
-  };
-
-  const showDatePicker = () => {
-    setDatePickerVisibility(true);
-  };
-
-  const hideDatePicker = () => {
-    setDatePickerVisibility(false);
-  };
-
-  const handleConfirmDate = (date) => {
-    setCompletionDate(date.toLocaleDateString());
-    hideDatePicker();
+  const handleAddTask = async () => {
+    user = JSON.parse(currentUser);
+    console.log(user.id);
+    try {
+      // Aqui estamos fazendo uma requisição POST para o endpoint de criação de tarefa
+      const response = await axios.post(
+        "http://192.168.0.112:3333/tasks/create",
+        {
+          user_id: user.id, // Obtendo o id do usuário atual
+          description: description, // Supondo que 'description' é uma variável no escopo do componente
+        }
+      );
+      console.log(response.data); // Aqui você pode lidar com a resposta do servidor, se necessário
+    } catch (error) {
+      console.error("Erro ao criar tarefa:", error);
+    }
   };
 
   return (
@@ -79,36 +79,18 @@ const AddTask = ({ navigation }) => {
           alignItems: "center",
         }}
       >
-        <View
- 
-        >
-          <Text style={{ fontWeight: "500", color: "gray", marginBottom: 5 }}>
-            Insira seu username
+        <View>
+          <Text style={{ fontWeight: "600", color: "gray", marginBottom: 5 }}>
+            Insira a descrição da sua tarefa
           </Text>
           <TextInput
-            placeholder="Descrição da tarefa"
-            style={[styles.input, { height: 100, width:370 }]} // Definindo uma altura de 100 unidades
+            style={[styles.input, { height: 100, width: 370 }]}
             value={description}
             onChangeText={(text) => setDescription(text)}
-            multiline={true} // Permitindo múltiplas linhas
+            multiline={true}
+            textAlignVertical="top" // Definindo o texto para começar do topo
           />
         </View>
-
-        {/* Data de conclusão da tarefa */}
-        <TouchableOpacity style={styles.input} onPress={showDatePicker}>
-          <Text>
-            {completionDate ? completionDate : "Selecionar data de conclusão"}
-          </Text>
-        </TouchableOpacity>
-        <DateTimePickerModal
-          isVisible={isDatePickerVisible}
-          mode="date"
-          onConfirm={handleConfirmDate}
-          onCancel={hideDatePicker}
-          textColor="#4530B3" // Cor do texto
-          backgroundColor="#FFFFFF" // Cor de fundo
-          headerBackgroundColor="#0b1f51" // Cor do cabeçalho
-        />
 
         {/* Botão para adicionar tarefa */}
         <TouchableOpacity style={styles.addButton} onPress={handleAddTask}>
@@ -126,14 +108,14 @@ const styles = StyleSheet.create({
     width: "90%",
     height: 40,
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: "#aaa",
     borderRadius: 5,
-    paddingHorizontal: 10,
+    padding: 10,
     marginBottom: 20,
     justifyContent: "center",
   },
   addButton: {
-    backgroundColor: "#4530B3",
+    backgroundColor: "#0b1f51",
     width: "90%",
     height: 55,
     borderRadius: 5,
