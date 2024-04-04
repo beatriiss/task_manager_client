@@ -56,6 +56,7 @@ const Dashboard = ({ navigation }) => {
           placeholder="Pesquisar..."
           value={searchQuery}
           onChangeText={handleSearch}
+          cursorColor={"gray"}
         />
       </View>
       {/* Adicionando o Switch */}

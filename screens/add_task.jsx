@@ -5,9 +5,9 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
+  Alert // Importando o componente de alerta do React Native
 } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
-import DateTimePickerModal from "react-native-modal-datetime-picker";
 import axios from "axios";
 import { AuthContext } from "../context/auth_context";
 
@@ -16,7 +16,7 @@ const AddTask = ({ navigation }) => {
   const [description, setDescription] = useState("");
 
   const handleAddTask = async () => {
-    user = JSON.parse(currentUser);
+    const user = JSON.parse(currentUser);
     console.log(user.id);
     try {
       // Aqui estamos fazendo uma requisição POST para o endpoint de criação de tarefa
@@ -28,6 +28,28 @@ const AddTask = ({ navigation }) => {
         }
       );
       console.log(response.data); // Aqui você pode lidar com a resposta do servidor, se necessário
+      // Exibir o alerta ao usuário
+      Alert.alert(
+        "Tarefa adicionada com sucesso!",
+        "Deseja adicionar outra tarefa?",
+        [
+          {
+            text: "Sim",
+            onPress: () => {
+              setDescription(""); // Limpar o campo de descrição
+            },
+          },
+          {
+            text: "Não",
+            onPress: () => {
+              setDescription(""); // Limpar o campo de descrição
+              navigation.navigate("Dashboard"); // Navegar para a tela Dashboard
+            },
+            style: "cancel",
+          },
+        ],
+        { cancelable: false }
+      );
     } catch (error) {
       console.error("Erro ao criar tarefa:", error);
     }
@@ -84,6 +106,7 @@ const AddTask = ({ navigation }) => {
             Insira a descrição da sua tarefa
           </Text>
           <TextInput
+          cursorColor={"gray"}
             style={[styles.input, { height: 100, width: 370 }]}
             value={description}
             onChangeText={(text) => setDescription(text)}
@@ -112,7 +135,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 10,
     marginBottom: 20,
-    justifyContent: "center",
+    justifyContent: "center"
   },
   addButton: {
     backgroundColor: "#0b1f51",
