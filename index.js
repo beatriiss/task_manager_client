@@ -8,8 +8,7 @@ import Dashboard from "./screens/dashboard";
 import Add_task from "./screens/add_task";
 import { useContext, useEffect } from "react";
 import { AuthContext } from "./context/auth_context";
-import axios from "axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+
 
 const Stack = createNativeStackNavigator();
 

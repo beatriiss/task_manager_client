@@ -18,7 +18,7 @@ export const AuthContextProvider = ({ children }) => {
   }, []);
 
   const login = async ({ username, password}) => {
-    // Verifica se os campos estão preenchidos
+    // verifica se os campos estão preenchidos
     if (!username || !password) {
       console.log("Preencha os campos")
       return;
@@ -31,7 +31,7 @@ export const AuthContextProvider = ({ children }) => {
       });
 
       if (response.status === 200) {
-        // Salvar usuário localmente
+        // salvar usuário localmente
         AsyncStorage.setItem('user', JSON.stringify(response.data.user));
         setCurrentUser(JSON.stringify(response.data.user))
 
@@ -45,8 +45,9 @@ export const AuthContextProvider = ({ children }) => {
     }
   };
 
-  const handleCadastro = async ({ username, email, password}) => {
-    // Verifica se os campos estão preenchidos
+  const cadastro = async ({ username, email, password}) => {
+
+    // verifica se os campos estão preenchidos
     if (!username || !email || !password) {
       console.log("Por favor, preencha todos os campos.");
       return;
@@ -60,11 +61,11 @@ export const AuthContextProvider = ({ children }) => {
       });
 
       if (response.status === 200) {
-        // Salvar usuário localmente
+        // salvar usuário localmente
         AsyncStorage.setItem('user', JSON.stringify(response.data.user));
        
       } else {
-        // Exibir alerta se o status for diferente de 200 (cadastro falhou)
+        // exibir alerta se o status for diferente de 200 (cadastro falhou)
         console.log('Erro ao cadastrar usuário. Por favor, tente novamente.');
       }
     } catch (error) {
@@ -79,11 +80,12 @@ export const AuthContextProvider = ({ children }) => {
   };
 
   const editar_context = async ({ dados, navigation }) => {
-    // Lógica de edição do usuário
+    // lógica de edição do usuário
+    // ainda não implementado
   };
 
   return (
-    <AuthContext.Provider value={{ currentUser, login, handleCadastro, logout_context, editar_context }}>
+    <AuthContext.Provider value={{ currentUser, login, cadastro, logout_context, editar_context }}>
       {children}
     </AuthContext.Provider>
   );
