@@ -7,6 +7,7 @@ Este repositório contém o  frontend de uma aplicação simples de gestão de t
 - Dashboard
 - Adicionar tarefa
 - Perfil
+![Login]([URL_da_sua_imagem](https://raw.githubusercontent.com/beatriiss/task_manager_client/main/assets/Screenshot_1712343945.png))
 
 ## Instalação
 Clonar e acessar o projeto 
