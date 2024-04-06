@@ -10,10 +10,10 @@ Este repositório contém o  frontend de uma aplicação simples de gestão de t
 
 
 <div style="display: flex; justify-content: center; margin-bottom:20px">
-    <img src="https://raw.githubusercontent.com/beatriiss/task_manager_client/main/assets/Screenshot_1712343945.png" alt="Login" width="225" style="margin-right: 20px;">
-    <img src="https://raw.githubusercontent.com/beatriiss/task_manager_client/main/assets/Screenshot_1712343948.png" alt="Cadastro" width="225" style="margin-right: 20px;">
-    <img src="https://raw.githubusercontent.com/beatriiss/task_manager_client/main/assets/Screenshot_1712343948.png" alt="Cadastro" width="225" style="margin-right: 20px;">
-    <img src="https://github.com/beatriiss/task_manager_client/blob/main/assets/Screenshot_1712343915.png" alt="Cadastro" width="225" style="margin-right: 20px;">
+    <img src="https://raw.githubusercontent.com/beatriiss/task_manager_client/main/assets/Screenshot_1712343945.png" alt="Login" width="200" style="margin-right: 20px;">
+    <img src="https://raw.githubusercontent.com/beatriiss/task_manager_client/main/assets/Screenshot_1712343948.png" alt="Cadastro" width="200" style="margin-right: 20px;">
+    <img src="https://raw.githubusercontent.com/beatriiss/task_manager_client/main/assets/Screenshot_1712343907.png" alt="Cadastro" width="200" style="margin-right: 20px;">
+    <img src="https://github.com/beatriiss/task_manager_client/blob/main/assets/Screenshot_1712343915.png" alt="Cadastro" width="200" style="margin-right: 20px;">
 </div>
 
 
