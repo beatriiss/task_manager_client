@@ -1,96 +1,131 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import axios from 'axios';
+import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import showFlashMessage from "../components/message";
+import { url } from "../config/url";
 
 export const AuthContext = createContext();
 
 export const AuthContextProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
 
-
   useEffect(() => {
     const handleUserData = async () => {
-      const userdata = await AsyncStorage.getItem('user');
+      const userdata = await AsyncStorage.getItem("user");
 
-      setCurrentUser(userdata? userdata : null);
+      setCurrentUser(userdata ? userdata : null);
     };
     handleUserData();
   }, []);
 
-  const login = async ({ username, password}) => {
+  const login = async ({ username, password }) => {
     // verifica se os campos estão preenchidos
     if (!username || !password) {
-      console.log("Preencha os campos")
+      console.log("Preencha os campos");
+      showFlashMessage("Preeencha os campos!", "danger");
       return;
     }
 
     try {
-      const response = await axios.post('http://192.168.0.112:3333/user/login', {
-        username,
-        password
-      });
+      const response = await axios.post(
+        `${url}user/login`,
+        {
+          username,
+          password,
+        }
+      );
 
       if (response.status === 200) {
         // salvar usuário localmente
-        AsyncStorage.setItem('user', JSON.stringify(response.data.user));
-        setCurrentUser(JSON.stringify(response.data.user))
-
+        AsyncStorage.setItem("user", JSON.stringify(response.data.user));
+        setCurrentUser(JSON.stringify(response.data.user));
+        showFlashMessage("Usuário autênticado!", "success");
+        
       } else {
-        console.log("Usuário não encontrado")
-
+        console.log("Usuário não encontrado");
+        showFlashMessage("Usuário não encontrado!", "danger");
       }
     } catch (error) {
       console.log(error);
-
     }
   };
 
-  const cadastro = async ({ username, email, password}) => {
-
+  const cadastro = async ({ username, email, password }) => {
     // verifica se os campos estão preenchidos
     if (!username || !email || !password) {
-      console.log("Por favor, preencha todos os campos.");
+      showFlashMessage("Preeencha os campos!", "danger");
       return;
     }
 
     try {
-      const response = await axios.post('http://192.168.0.112:3333/user/cadastro', {
-        username,
-        email,
-        password
-      });
+      const response = await axios.post(
+        `${url}user/cadastro`,
+        {
+          username,
+          email,
+          password,
+        }
+      );
 
-      if (response.status === 200) {
+      if (response.status === 201) {
         // salvar usuário localmente
-        AsyncStorage.setItem('user', JSON.stringify(response.data.user));
-       
+        AsyncStorage.setItem("user", JSON.stringify(response.data.user));
+        setCurrentUser(JSON.stringify(response.data.user));
+        showFlashMessage("Usuário cadastrado e autênticado!", "success");
       } else {
         // exibir alerta se o status for diferente de 200 (cadastro falhou)
-        console.log('Erro ao cadastrar usuário. Por favor, tente novamente.');
+        showFlashMessage("Esse e-mail ja esta cadastrado!", "danger");
       }
     } catch (error) {
       console.log(error);
-      console.log('Erro ao fazer cadastro. Por favor, tente novamente.');
+      showFlashMessage("Esse e-mail ja esta cadastrado!", "danger");
     }
   };
 
   const logout_context = async () => {
     setCurrentUser(null);
-    localStorage.removeItem('user');
+    AsyncStorage.removeItem("user");
+    showFlashMessage("Log out efetuado!", "success");
   };
 
-  const editar_context = async ({ dados, navigation }) => {
-    // lógica de edição do usuário
-    // ainda não implementado
+  const editar = async ({ Username, Email, Password, Id}) => {
+    // Verifica se os campos estão preenchidos
+    if (!Username || !Email || !Password) {
+      showFlashMessage("Preeencha os campos!", "danger");
+      return;
+    }
+
+    // Realiza a solicitação para editar o usuário
+    axios
+      .put(`${url}user/editar/${Id}`, {
+        username: Username,
+        email: Email,
+        password: Password,
+      })
+      .then((response) => {
+        // Se a solicitação for bem-sucedida, atualize a tela ou realize outras ações necessárias
+        console.log(response.data.user); // exibe a mensagem do servidor
+        AsyncStorage.setItem("user", JSON.stringify(response.data.user));
+        setCurrentUser(JSON.stringify(response.data.user));
+        showFlashMessage("Edição concluida!", "success");
+        
+      })
+      .catch((error) => {
+        // Se ocorrer algum erro na solicitação, exiba uma mensagem de erro
+        console.error("Erro ao editar usuário:", error);
+        showFlashMessage("Erro ao editar usuário!", "danger");
+      });
   };
 
   return (
-    <AuthContext.Provider value={{ currentUser, login, cadastro, logout_context, editar_context }}>
+    <AuthContext.Provider
+      value={{ currentUser, login, cadastro, logout_context, editar }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
 
 export const useAuth = () => {
-  return useContext(AuthContext)
+  return useContext(AuthContext);
 };

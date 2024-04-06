@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { CheckBox, Icon } from "react-native-elements";
 import axios from "axios";
+import { url } from "../config/url";
 
 const TaskComponent = ({ task, onDelete }) => {
   const [updating, setUpdating] = useState(false);
@@ -10,7 +11,7 @@ const TaskComponent = ({ task, onDelete }) => {
     if (updating) return;
     setUpdating(true);
     try {
-      await axios.put(`http://192.168.0.112:3333/tasks/update/${task.id}`, {
+      await axios.put(`${url}tasks/update/${task.id}`, {
         completed: !task.completed,
       });
       task.completed = !task.completed;
@@ -23,7 +24,7 @@ const TaskComponent = ({ task, onDelete }) => {
 
   const handleDeleteClick = async () => {
     try {
-      await axios.delete(`http://192.168.0.112:3333/tasks/delete/${task.id}`);
+      await axios.delete(`${url}tasks/delete/${task.id}`);
       onDelete()
     } catch (error) {
       console.error("Erro ao deletar a tarefa:", error);
@@ -60,10 +61,12 @@ const styles = StyleSheet.create({
     borderColor: "#241471",
     paddingHorizontal: 10,
     borderWidth: 1.5,
+    paddingVertical:5
   },
   taskText: {
     fontSize: 16,
     color: "#000",
+    maxWidth:"70%"
   },
   item:{
     display:'flex',

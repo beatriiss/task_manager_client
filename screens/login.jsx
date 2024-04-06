@@ -110,22 +110,7 @@ const Login = ({ navigation }) => {
           />
         </View>
 
-        <TouchableOpacity
-          style={{
-            marginTop: -20,
-            backgroundColor: "#fff",
-            width: 350,
-            height: 55,
-            borderRadius: 5,
-            justifyContent: "center",
-            alignItems: "flex-end",
-          }}
-          onPress={() => navigation.navigate("ForgotPassword")}
-        >
-          <Text style={{ color: "#261a66", fontSize: 15, fontWeight: "bold" }}>
-            Esqueceu sua senha?
-          </Text>
-        </TouchableOpacity>
+
         <TouchableOpacity
           style={{
             marginTop: 10,

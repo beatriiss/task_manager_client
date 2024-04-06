@@ -6,6 +6,7 @@ import Login from "./screens/login";
 import Cadastro from "./screens/cadastro";
 import Dashboard from "./screens/dashboard";
 import Add_task from "./screens/add_task";
+import Perfil from "./screens/perfil";
 import { useContext, useEffect } from "react";
 import { AuthContext } from "./context/auth_context";
 
@@ -29,6 +30,11 @@ export default function App() {
             <Stack.Screen
               name="Add_task"
               component={Add_task}
+              options={{ title: null, headerShown: false }}
+            />
+            <Stack.Screen
+              name="Perfil"
+              component={Perfil}
               options={{ title: null, headerShown: false }}
             />
           

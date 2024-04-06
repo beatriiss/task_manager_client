@@ -10,6 +10,8 @@ import {
 import { FontAwesome } from "@expo/vector-icons";
 import axios from "axios";
 import { AuthContext } from "../context/auth_context";
+import showFlashMessage from "../components/message";
+import { url } from "../config/url";
 
 const AddTask = ({ navigation }) => {
   const { currentUser } = useContext(AuthContext);
@@ -19,18 +21,22 @@ const AddTask = ({ navigation }) => {
     const user = JSON.parse(currentUser);
     console.log(user.id);
     try {
+      if (!description || description.trim() === '') { // Verifica se a descrição está vazia ou em branco
+        showFlashMessage("A descrição da tarefa não pode estar vazia!", "danger");
+        return; // Sai da função se a descrição estiver vazia
+      }
+      
       // Aqui estamos fazendo uma requisição POST para o endpoint de criação de tarefa
       const response = await axios.post(
-        "http://192.168.0.112:3333/tasks/create",
+        `${url}tasks/create`,
         {
           user_id: user.id, // Obtendo o id do usuário atual
           description: description, // Supondo que 'description' é uma variável no escopo do componente
         }
       );
-      console.log(response.data); // Aqui você pode lidar com a resposta do servidor, se necessário
-      // Exibir o alerta ao usuário
+      showFlashMessage("Tarefa adicionada!", "success");
       Alert.alert(
-        "Tarefa adicionada com sucesso!",
+         `Ei, ${user.username}`,
         "Deseja adicionar outra tarefa?",
         [
           {
@@ -52,8 +58,10 @@ const AddTask = ({ navigation }) => {
       );
     } catch (error) {
       console.error("Erro ao criar tarefa:", error);
+      showFlashMessage("Erro ao criar tarefa!", "danger");
     }
   };
+  
 
   return (
     <View
@@ -78,7 +86,7 @@ const AddTask = ({ navigation }) => {
           name="arrow-left"
           size={25}
           color="#261a66"
-          style={{ marginLeft: 10 }}
+          style={{ marginLeft: 12 }}
           onPress={() => navigation.goBack()}
         />
         <Text
@@ -95,7 +103,7 @@ const AddTask = ({ navigation }) => {
 
       <View
         style={{
-          marginTop: 50,
+          marginTop: 30,
           width: "100%",
           justifyContent: "center",
           alignItems: "center",

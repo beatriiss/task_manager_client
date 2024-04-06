@@ -7,12 +7,14 @@ import {
   TouchableOpacity,
   Switch,
   Keyboard,
+  ScrollView,
 } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import axios from "axios";
 import { useFocusEffect } from "@react-navigation/native";
 import { AuthContext } from "../context/auth_context";
 import TaskComponent from "../components/task";
+import { url } from "../config/url";
 
 const Dashboard = ({ navigation }) => {
   // importa o usuário logado do contexto
@@ -31,9 +33,13 @@ const Dashboard = ({ navigation }) => {
     setUser(JSON.parse(currentUser));
     try {
       const response = await axios.get(
-        `http://192.168.0.112:3333/tasks/find/${user.id}`
+        `${url}tasks/find/${user.id}`
       );
-      setTasks(response.data);
+      // Ordenando as tarefas com base no campo 'createdAt'
+      const sortedTasks = response.data.sort((a, b) => {
+        return new Date(b.created_at) - new Date(a.created_at);
+      });
+      setTasks(sortedTasks);
     } catch (error) {
       console.error("Erro ao obter tarefas:", error);
     }
@@ -74,9 +80,14 @@ const Dashboard = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-      <Text style={styles.headerTitle}>Tarefas</Text>
-      <FontAwesome style={styles.logo} name="user"  size={30} color="#0b1f51" />
-
+        <Text style={styles.headerTitle}>Tarefas</Text>
+        <FontAwesome
+          onPress={() => navigation.navigate("Perfil")}
+          style={styles.logo}
+          name="user"
+          size={30}
+          color="#0b1f51"
+        />
       </View>
 
       <View style={styles.switchContainer}>
@@ -90,7 +101,7 @@ const Dashboard = ({ navigation }) => {
           thumbColor={showCompletedTasks ? "#261a66" : "#4550bb"}
         />
       </View>
-      <View style={styles.resultsContainer}>
+      <ScrollView style={styles.resultsContainer}>
         {tasks.length > 0 ? (
           tasks
             .filter((task) => showCompletedTasks || !task.completed)
@@ -104,20 +115,24 @@ const Dashboard = ({ navigation }) => {
         )}
 
         {tasks.filter((task) => showCompletedTasks || !task.completed)
-          .length === 0 && (
-          <View style={styles.taskContainer}>
-            <Text style={styles.noTasksText}>Nenhuma tarefa pendente</Text>
-          </View>
-        )}
-      </View>
+          .length === 0 &&
+          tasks.length !== 0 && (
+            <View style={styles.taskContainer}>
+              <Text style={styles.noTasksText}>Nenhuma tarefa pendente</Text>
+            </View>
+          )}
+      </ScrollView>
 
       {!keyboardVisible && (
-        <TouchableOpacity
-          style={styles.addButton}
-          onPress={() => navigation.navigate("Add_task")}
-        >
-          <FontAwesome name="plus" size={20} color="white" />
-        </TouchableOpacity>
+        <View style={styles.info}>
+          <Text style={styles.text}>Você possui {tasks.length} tarefas</Text>
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={() => navigation.navigate("Add_task")}
+          >
+            <FontAwesome name="plus" size={20} color="white" />
+          </TouchableOpacity>
+        </View>
       )}
     </View>
   );
@@ -129,6 +144,13 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-start",
     alignItems: "center",
+  },
+  info: {
+    justifyContent: "space-between",
+    alignItems: "center",
+    flexDirection: "row",
+    width: "100%",
+    padding: 20,
   },
   header: {
     flexDirection: "row",
@@ -171,20 +193,25 @@ const styles = StyleSheet.create({
   resultsContainer: {
     marginTop: 20,
     paddingHorizontal: 20,
+
+    width: "100%",
+    height: 500,
   },
   noTasksText: {
     fontSize: 17,
     fontWeight: "500",
   },
+  text: {
+    fontSize: 20,
+    fontWeight: "800",
+    color: "#241471",
+  },
   addButton: {
-    position: "absolute",
-    bottom: 40,
-    right: 30,
     backgroundColor: "#4530b3",
     padding: 0,
     borderRadius: 50,
-    width: 75,
-    height: 75,
+    width: 70,
+    height: 70,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -199,14 +226,13 @@ const styles = StyleSheet.create({
   taskContainer: {
     flexDirection: "row",
     alignItems: "center",
-
     justifyContent: "center",
     borderRadius: 10,
     borderColor: "#241471",
     paddingHorizontal: 82,
     borderWidth: 1.5,
     paddingVertical: 15,
-    marginTop:50
+    marginTop: 50,
   },
 });
 
